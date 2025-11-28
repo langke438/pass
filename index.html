@@ -2,7 +2,8 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>从你的全世界路过</title>
     <style>
         /* 全局样式重置 */
@@ -14,7 +15,7 @@
 
         /* 背景与字体设置 */
         body {
-            font-family: 'Microsoft YaHei', sans-serif;
+            font-family: 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #f5f7fa 0%, #e8f1f5 100%);
             color: #333;
             overflow-x: hidden;
@@ -28,14 +29,17 @@
             max-width: 800px;
             margin: 0 auto;
             padding: 40px 20px;
-            background: rgba(255, 255, 255, 0.85);
+            /* 降级方案 - 优先使用 */
+            background: rgba(255, 255, 255, 0.95);
+            /* 现代浏览器支持 */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px); /* Safari支持 */
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             border-radius: 15px;
             margin-top: 30px;
             margin-bottom: 30px;
             position: relative;
             z-index: 1;
-            backdrop-filter: blur(10px);
         }
 
         /* 标题样式 */
@@ -74,15 +78,21 @@
         }
 
         /* 视频样式 */
-        video {
+        .video-container {
             width: 100%;
             border-radius: 10px;
             margin-bottom: 30px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        video {
+            width: 100%;
+            display: block;
             transition: transform 0.3s ease;
         }
 
-        video:hover {
+        .video-container:hover video {
             transform: scale(1.02);
         }
 
@@ -107,10 +117,26 @@
             margin-bottom: 30px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease;
+            display: block;
         }
 
         img:hover {
             transform: scale(1.02);
+        }
+
+        /* 视频错误提示 */
+        .video-fallback {
+            padding: 20px;
+            text-align: center;
+            color: #888;
+            background: #f9f9f9;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .video-fallback a {
+            color: #e22c6c;
+            text-decoration: none;
         }
 
         /* 动态雨效果 */
@@ -122,6 +148,7 @@
             height: 100%;
             pointer-events: none;
             z-index: 0;
+            overflow: hidden;
         }
 
         .raindrop {
@@ -129,6 +156,7 @@
             background: rgba(226, 44, 108, 0.2);
             border-radius: 50%;
             animation: fall linear infinite;
+            -webkit-animation: fall linear infinite;
         }
 
         @keyframes fall {
@@ -148,6 +176,23 @@
             }
         }
 
+        @-webkit-keyframes fall {
+            0% {
+                -webkit-transform: translateY(-10px) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                -webkit-transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
         /* 响应式设计 */
         @media (max-width: 768px) {
             .container {
@@ -155,6 +200,8 @@
                 padding: 20px;
                 margin-top: 20px;
                 margin-bottom: 20px;
+                backdrop-filter: blur(5px);
+                -webkit-backdrop-filter: blur(5px);
             }
             
             h1 {
@@ -175,6 +222,10 @@
             position: relative;
             z-index: 1;
         }
+
+        footer p {
+            text-indent: 0;
+        }
     </style>
 </head>
 <body>
@@ -189,8 +240,15 @@
             <span id="time">2025年11月12日 14:00</span>
         </div>
         
-        <!-- 内容区域 -->
-        <video src="video/从你的全世界路过.mp4" controls width="100%"></video>
+        <!-- 内容区域 - 优化的视频标签 -->
+        <div class="video-container">
+            <video controls preload="metadata" playsinline>
+                <source src="video/passing_through.mp4" type="video/mp4">
+                <div class="video-fallback">
+                    您的浏览器不支持视频播放，请<a href="video/passing_through.mp4">下载视频</a>查看
+                </div>
+            </video>
+        </div>
         
         <p>
             我偷偷的告诉你，有一个地方叫做稻城，我要和我最心爱的人一起去那里，看蔚蓝的天空，看白色的雪山，看金色的草地，看一场秋天的童话。我要告诉他，如果没有住在你的心里，都是客死他乡！我要告诉他，相爱这件事情，就是永远在一起。
@@ -199,7 +257,7 @@
             <strong>记住，所有人的坚强，都是温柔生的茧。</strong>
         </p>
         
-        <img src="img/cmyj.gif" alt="图片" width="100%">
+        <img src="img/cmyj.gif" alt="图片">
         
         <p>
             我希望有个如你一般的人，如山间清爽的风，如古城温暖的光，从清晨到夜晚，从山野到书房，一切都没有关系。只要最后是你就好。一个人，终将拥有另一个人，对你点点头，贯彻未来，数遍生命的公路牌。
@@ -207,50 +265,94 @@
     </div>
     
     <footer>
-        <p style="text-indent: 0;">从你的全世界路过</p>
+        <p>从你的全世界路过</p>
     </footer>
 
-    <!-- 动态雨效果脚本 -->
+    <!-- 优化的JavaScript代码 -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const rain = document.getElementById('rain');
-            const amountOfDrops = 100; // 雨滴数量
-            
-            // 创建雨滴
-            for (let i = 0; i < amountOfDrops; i++) {
-                let drop = document.createElement('div');
-                drop.className = 'raindrop';
+            try {
+                // 视频兼容性处理
+                const videoElement = document.querySelector('video');
+                if (videoElement) {
+                    videoElement.addEventListener('error', function(e) {
+                        console.error('视频加载失败:', e);
+                        // 显示备选内容
+                        const fallback = document.querySelector('.video-fallback');
+                        if (fallback) {
+                            fallback.style.display = 'block';
+                        }
+                    });
+                }
+
+                // 创建雨滴效果 - 优化版本
+                const createRainEffect = function() {
+                    const rain = document.getElementById('rain');
+                    if (!rain) return;
+                    
+                    // 减少雨滴数量以提升性能
+                    const amountOfDrops = 50; 
+                    const fragment = document.createDocumentFragment();
+                    
+                    // 批量创建雨滴
+                    for (let i = 0; i < amountOfDrops; i++) {
+                        let drop = document.createElement('div');
+                        drop.className = 'raindrop';
+                        
+                        // 随机位置、大小和下落时间
+                        let left = Math.random() * 100;
+                        let width = Math.random() * 4 + 1; // 减小雨滴大小
+                        let height = width * 2;
+                        let delay = Math.random() * 5;
+                        let duration = Math.random() * 4 + 3; // 调整持续时间
+                        let opacity = Math.random() * 0.4 + 0.1; // 降低透明度
+                        
+                        // 设置雨滴样式
+                        drop.style.left = left + 'vw';
+                        drop.style.width = width + 'px';
+                        drop.style.height = height + 'px';
+                        drop.style.animationDelay = delay + 's';
+                        drop.style.animationDuration = duration + 's';
+                        drop.style.opacity = opacity;
+                        // 添加WebKit前缀
+                        drop.style.webkitAnimationDelay = delay + 's';
+                        drop.style.webkitAnimationDuration = duration + 's';
+                        
+                        fragment.appendChild(drop);
+                    }
+                    
+                    // 一次性添加所有雨滴，减少DOM操作
+                    rain.appendChild(fragment);
+                };
+
+                // 更新时间
+                const updateTime = function() {
+                    try {
+                        const timeElement = document.getElementById('time');
+                        if (timeElement) {
+                            const now = new Date();
+                            const year = now.getFullYear();
+                            const month = String(now.getMonth() + 1).padStart(2, '0');
+                            const day = String(now.getDate()).padStart(2, '0');
+                            const hours = String(now.getHours()).padStart(2, '0');
+                            const minutes = String(now.getMinutes()).padStart(2, '0');
+                            
+                            timeElement.textContent = `${year}年${month}月${day}日 ${hours}:${minutes}`;
+                        }
+                    } catch (e) {
+                        console.error('时间更新失败:', e);
+                    }
+                };
+
+                // 执行函数
+                updateTime();
                 
-                // 随机位置、大小和下落时间
-                let left = Math.random() * 100;
-                let width = Math.random() * 5 + 1;
-                let height = width * 2;
-                let delay = Math.random() * 5;
-                let duration = Math.random() * 5 + 2;
-                let opacity = Math.random() * 0.5 + 0.2;
-                
-                // 设置雨滴样式
-                drop.style.left = left + 'vw';
-                drop.style.width = width + 'px';
-                drop.style.height = height + 'px';
-                drop.style.animationDelay = delay + 's';
-                drop.style.animationDuration = duration + 's';
-                drop.style.opacity = opacity;
-                
-                rain.appendChild(drop);
-            }
-            
-            // 更新时间
-            const timeElement = document.getElementById('time');
-            if (timeElement) {
-                const now = new Date();
-                const year = now.getFullYear();
-                const month = String(now.getMonth() + 1).padStart(2, '0');
-                const day = String(now.getDate()).padStart(2, '0');
-                const hours = String(now.getHours()).padStart(2, '0');
-                const minutes = String(now.getMinutes()).padStart(2, '0');
-                
-                timeElement.textContent = `${year}年${month}月${day}日 ${hours}:${minutes}`;
+                // 延迟创建雨滴效果，确保页面其他元素先加载
+                setTimeout(createRainEffect, 500);
+
+            } catch (error) {
+                console.error('页面初始化错误:', error);
+                // 错误不会阻止页面显示
             }
         });
     </script>
